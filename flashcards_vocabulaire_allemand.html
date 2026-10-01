@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabulaire Allemand - Flashcards</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --primary-color: #3b82f6;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 15px;
+        }
+
+        header {
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .counter {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+            font-weight: 600;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .card-wrapper {
+            width: 100%;
+            height: 320px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.4s cubic-bezier(0.4, 0.2, 0.2, 1);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+            border-radius: 20px;
+            background-color: var(--card-bg);
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 600;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .card-front {
+            color: var(--text-dark);
+            border: 2px solid #e2e8f0;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            background-color: #f0f7ff;
+        }
+
+        .controls {
+            display: flex;
+            width: 100%;
+            gap: 10px;
+            justify-content: space-between;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 10px;
+            background-color: var(--card-bg);
+            color: var(--text-dark);
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+            background-color: #e2e8f0;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:active {
+            background-color: #2563eb;
+        }
+
+        footer {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Vocabulaire Allemand</h1>
+        <div class="counter" id="counter">1 / 67</div>
+    </header>
+
+    <div class="main-container">
+        <div class="card-wrapper" id="cardWrapper">
+            <div class="card" id="card">
+                <div class="card-face card-front" id="cardFront">... Firma</div>
+                <div class="card-face card-back" id="cardBack">die Firma (L'entreprise)</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="prevCard()">← Préc.</button>
+            <button class="btn btn-primary" onclick="flipCard()">Retourner</button>
+            <button class="btn" onclick="shuffleCards()">🎲</button>
+            <button class="btn" onclick="nextCard()">Suiv. →</button>
+        </div>
+    </div>
+
+    <footer>
+        Sur mobile : Touche pour retourner, glisse pour changer de carte.
+    </footer>
+
+    <script>
+        const originalCards = [
+            { front: "... Firma", back: "die Firma (L'entreprise)" },
+            { front: "... Philharmonie", back: "die Philharmonie (La philharmonie)" },
+            { front: "... Navi", back: "das Navi (Le GPS / La navigation)" },
+            { front: "... Navigationssystem", back: "das Navigationssystem (Le système de navigation / GPS)" },
+            { front: "... Straßenbahn", back: "die Straßenbahn (Le tramway)" },
+            { front: "Verspätung haben", back: "Verspätung haben (Avoir du retard)" },
+            { front: "... Theater", back: "das Theater (Le théâtre)" },
+            { front: "... Kino", back: "das Kino (Le cinéma)" },
+            { front: "... Museum", back: "das Museum (Le musée)" },
+            { front: "... U-Bahn", back: "die U-Bahn (Le métro)" },
+            { front: "... Stau", back: "der Stau (L'embouteillage / Les bouchons)" },
+            { front: "... Anschluss", back: "der Anschluss (La correspondance)" },
+            { front: "... Kreuzung", back: "die Kreuzung (Le carrefour / L'intersection)" },
+            { front: "... Haltestelle", back: "die Haltestelle (L'arrêt)" },
+            { front: "... Kreisel", back: "der Kreisel (Le rond-point)" },
+            { front: "... Karte", back: "die Karte (La carte / Le plan)" },
+            { front: "... Bahnhof", back: "der Bahnhof (La gare)" },
+            { front: "... Parkhaus", back: "das Parkhaus (Le parking couvert)" },
+            { front: "... Führerschein", back: "der Führerschein (Le permis de conduire)" },
+            { front: "An (datif) ... vorbei", back: "An (datif) ... vorbei (Passer devant / Longer)" },
+            { front: "Bis zu", back: "Bis zu (Jusqu'à)" },
+            { front: "... E-Scooter", back: "der E-Scooter (La trottinette électrique)" },
+            { front: "... E-Tretroller", back: "der E-Tretroller (La trottinette électrique)" },
+            { front: "... E-Bike", back: "das E-Bike (Le vélo électrique)" },
+            { front: "... Pedelec", back: "das Pedelec (Le vélo à assistance électrique)" },
+            { front: "... Lastenrad", back: "das Lastenrad (Le vélo cargo)" },
+            { front: "... Cargobike", back: "das Cargobike (Le vélo cargo)" },
+            { front: "... Hoverboard", back: "das Hoverboard (L'hoverboard)" },
+            { front: "... Monowheel", back: "das Monowheel (La gyroroue / Monoroue)" },
+            { front: "... Einrad", back: "das Einrad (Le monocycle)" },
+            { front: "... Segway", back: "das Segway (Le gyropode / Segway)" },
+            { front: "... Sharing-Angebot", back: "das Sharing-Angebot (L'offre de partage / Le service de libre-service)" },
+            { front: "... Leihsystem", back: "das Leihsystem (Le système de location)" },
+            { front: "... Kurzstrecke", back: "die Kurzstrecke (Le court trajet - généralement moins de 5-8 km)" },
+            { front: "... Radweg", back: "der Radweg (La piste cyclable)" },
+            { front: "... Radfahrstreifen", back: "der Radfahrstreifen (La bande cyclable)" },
+            { front: "... Dockingstation", back: "die Dockingstation (La station d'attache)" },
+            { front: "... Ladestation", back: "die Ladestation (La borne de recharge)" },
+            { front: "... Free-Floating-System", back: "das Free-Floating-System (Le système de location en libre-service sans station fixe)" },
+            { front: "... Fahrradverleih", back: "der Fahrradverleih (La location de vélos)" },
+            { front: "... Verleihstation", back: "die Verleihstation (La station de location)" },
+            { front: "ein E-Bike / Fahrrad (per App) buchen / mieten", back: "ein E-Bike / Fahrrad (per App) buchen / mieten (Réserver / louer un vélo via une application)" },
+            { front: "... Buchung", back: "die Buchung (La réservation)" },
+            { front: "sich registrieren", back: "sich registrieren (S'inscrire / S'enregistrer)" },
+            { front: "... Nutzungsvertrag", back: "der Nutzungsvertrag (Le contrat d'utilisation)" },
+            { front: "... Nutzungsentgelt", back: "das Nutzungsentgelt (Les frais d'utilisation / La redevance)" },
+            { front: "... Zahlungsmittel", back: "das Zahlungsmittel (Le moyen de paiement)" },
+            { front: "das Fahrrad per QR-Code freischalten", back: "das Fahrrad per QR-Code freischalten (Déverrouiller le vélo par QR code)" },
+            { front: "die Buchung beenden", back: "die Buchung beenden (Terminer la réservation)" },
+            { front: "... Spätrückgabe", back: "die Spätrückgabe (Le retour tardif)" },
+            { front: "... Ausgangsstation", back: "die Ausgangsstation (La station de départ)" },
+            { front: "Abstellen", back: "Abstellen (Déposer / Garer)" },
+            { front: "parken", back: "parken (Stationner / Garer)" },
+            { front: "... Rahmenschloss", back: "das Rahmenschloss (Le antivol de cadre)" },
+            { front: "... Fahrradschloss", back: "das Fahrradschloss (Cadenas / Antivol de vélo)" },
+            { front: "... Helm", back: "der Helm (Le casque)" },
+            { front: "... Helmpflicht", back: "die Helmpflicht (L'obligation de porter un casque)" },
+            { front: "aufschließen", back: "aufschließen (Ouvrir / Déverrouiller)" },
+            { front: "abschließen", back: "abschließen (Fermer à clé / Verrouiller)" },
+            { front: "einen Diebstahl melden", back: "einen Diebstahl melden (Signaler un vol)" },
+            { front: "... Werkstatt", back: "die Werkstatt (L'atelier de réparation / Le garage)" },
+            { front: "... Reichweite", back: "die Reichweite (L'autonomie)" },
+            { front: "... Akkuladung", back: "die Akkuladung (La charge de la batterie)" },
+            { front: "... Batteriekapazität", back: "die Batteriekapazität (La capacité de la batterie)" },
+            { front: "die Batterie aufladen", back: "die Batterie aufladen (Recharger la batterie)" },
+            { front: "... Höchstgeschwindigkeit", back: "die Höchstgeschwindigkeit (La vitesse maximale)" },
+            { front: "... Mindestalter", back: "das Mindestalter (L'âge minimum)" },
+            { front: "... Versicherungspflicht", back: "die Versicherungspflicht (L'obligation d'assurance)" },
+            { front: "... Gehwegverbot", back: "das Gehwegverbot (L'interdiction de rouler sur le trottoir)" },
+            { front: "... Ampeln", back: "die Ampeln (Les feux de circulation)" },
+            { front: "... Miete", back: "die Miete (La location / Le loyer)" }
+        ];
+
+        let cards = [...originalCards];
+        let currentIndex = 0;
+        let isFlipped = false;
+
+        const cardEl = document.getElementById('card');
+        const cardWrapper = document.getElementById('cardWrapper');
+        const cardFront = document.getElementById('cardFront');
+        const cardBack = document.getElementById('cardBack');
+        const counterEl = document.getElementById('counter');
+
+        function updateCard() {
+            cardEl.style.transition = 'none';
+            cardEl.classList.remove('flipped');
+            isFlipped = false;
+
+            setTimeout(() => {
+                cardEl.style.transition = 'transform 0.4s cubic-bezier(0.4, 0.2, 0.2, 1)';
+                cardFront.innerText = cards[currentIndex].front;
+                cardBack.innerText = cards[currentIndex].back;
+                counterEl.innerText = `${currentIndex + 1} / ${cards.length}`;
+            }, 50);
+        }
+
+        function flipCard() {
+            isFlipped = !isFlipped;
+            cardEl.classList.toggle('flipped');
+        }
+
+        function nextCard() {
+            if (currentIndex < cards.length - 1) {
+                currentIndex++;
+                updateCard();
+            }
+        }
+
+        function prevCard() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateCard();
+            }
+        }
+
+        function shuffleCards() {
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+            currentIndex = 0;
+            updateCard();
+        }
+
+        // Événements tactiles (Tap et Swipe)
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        cardWrapper.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, false);
+
+        cardWrapper.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleGesture();
+        }, false);
+
+        function handleGesture() {
+            const swipeDistance = touchEndX - touchStartX;
+            if (Math.abs(swipeDistance) > 40) {
+                if (swipeDistance < 0) {
+                    nextCard();
+                } else {
+                    prevCard();
+                }
+            } else {
+                flipCard();
+            }
+        }
+
+        // Raccourcis Clavier
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                flipCard();
+            } else if (e.code === 'ArrowRight') {
+                nextCard();
+            } else if (e.code === 'ArrowLeft') {
+                prevCard();
+            }
+        });
+
+        updateCard();
+    </script>
+</body>
+</html>
